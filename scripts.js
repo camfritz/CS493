@@ -2,7 +2,7 @@ function signInClickListener(email, password) {
 	firebase.auth().signInWithEmailAndPassword(email, password)
 	.then(function() {
 		console.log(email)
-		alert("Success!");
+		window.location.replace("./user.html");
 	})
 	.catch(function(error) {
 		alert(error)
@@ -11,6 +11,18 @@ function signInClickListener(email, password) {
 
 function signUpClickListener(email, password) {
 	firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+		alert(error)
+	});
+}
+
+function googleSignInClickListener() {
+	var provider = new firebase.auth.GoogleAuthProvider();
+
+	firebase.auth().signInWithPopup(provider)
+	.then(function(result) {
+		window.location.replace("./user.html");
+	})
+	.catch(function(error) {
 		alert(error)
 	});
 }
