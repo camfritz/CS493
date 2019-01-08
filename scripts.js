@@ -10,7 +10,11 @@ function signInClickListener(email, password) {
 }
 
 function signUpClickListener(email, password) {
-	firebase.auth().createUserWithEmailAndPassword(email, password).catch(function(error) {
+	firebase.auth().createUserWithEmailAndPassword(email, password)
+	.then(function() {
+		alert("Account created!")
+	})
+		.catch(function(error) {
 		alert(error)
 	});
 }
