@@ -1,0 +1,45 @@
+      <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script src="./scripts.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+        <link rel="stylesheet" href="./css/bootstrap-social.css">
+        <title>Firebase Auth</title>
+
+        <script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+        <script>
+          var config = {
+            apiKey: "AIzaSyAtaDx6v3Q4yNAQVMe-z88v-64YKRTCOrQ",
+            authDomain: "cs493-14e09.firebaseapp.com",
+            databaseURL: "https://cs493-14e09.firebaseio.com",
+            projectId: "cs493-14e09",
+            storageBucket: "cs493-14e09.appspot.com",
+            messagingSenderId: "276297056112"
+          };
+          firebase.initializeApp(config);
+        </script>
+      </head>
+
+      <div class="container" style="margin: 50 auto; width: 50%;">
+        <div class="jumbotron">
+          <div class="text-center">
+      <p style="margin-top:25px">Log in or sign up!</p>
+      <br>
+          </div>
+          <form class="form-inline text-center">
+             <div class="form-group">
+               <label class="sr-only" for="email">Email</label>
+               <input type="email" class="form-control" id="email" placeholder="Email">
+             </div>
+             <div class="form-group">
+                <label class="sr-only" for="password">Password</label>
+                <input type="password" class="form-control" id="password" placeholder="Password">
+            </div>
+            <button id="login" class="btn btn-
+              default">Sign in</button>
+          </form><br><br>
+          <div class="text-center">Or</div><br>
+          <div class="text-center">
+            <a class="btn btn-google btn-lg" style="width: 260px" id="anonymousLogin">Sign In with Google</a>
+          </div>
+        </div>
+      </div>
