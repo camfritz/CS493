@@ -1,8 +1,11 @@
+var user;
+
 function signInClickListener(email, password) {
 	firebase.auth().signInWithEmailAndPassword(email, password)
 	.then(function() {
 		console.log(email)
 		window.location.replace("./user.html");
+		user = firebase.auth().currentUser;
 	})
 	.catch(function(error) {
 		alert(error)
@@ -28,5 +31,23 @@ function googleSignInClickListener() {
 	})
 	.catch(function(error) {
 		alert(error)
+	});
+}
+
+function getCurrentUser() {
+firebase.auth().onAuthStateChanged(function(user) {
+	if(user) {
+			var email;
+			if(user != null) {
+				email = user.email;
+				document.getElementById("email").innerHTML = email;
+
+				displayName = user.displayName
+				document.getElementById("name").innerHTML = displayName;
+			}
+		}
+		else {
+			window.location.replace("./index.html")
+		}
 	});
 }
