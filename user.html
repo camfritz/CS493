@@ -18,6 +18,14 @@
         };
         firebase.initializeApp(config);
       </script>
+
+      <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
+
+      <script>
+        $(document).ready(function() {
+          getCurrentUser();
+        })
+      </script>
       </head>
 
       <div class="container" style="margin: 50 auto; width: 50%;">
@@ -26,7 +34,9 @@
           </form>
           <br>
           <div class="text-center">
-            <h1>User Details</h1>
+            <h2 id="email">User Email</h2>
+            <br>
+            <h2 id="name">Display Name</h2>
         </div>
           <br>
         </div>
