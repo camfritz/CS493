@@ -49,7 +49,6 @@
         function readNotes() {
           firebase.database().ref('notes/').on('value', posts => {
             notes = posts.val();
-            console.log(Object.keys(notes));
 
             document.getElementById("notesList").innerHTML = "";
 
@@ -60,18 +59,40 @@
           })
         }
 
-        // $(document).on('show.bs.modal','#noteModal', function(event) {
-        //   alert('hi');
-        //   // console.log(`${notes[event.target.id].title}`);
-        // // console.log(`${event.target.id}`)
-        // })
-
         function openNote(event) {
           event.preventDefault();
-          console.log(`${notes[event.currentTarget.id].title}`)
 
           document.getElementById("modal_noteTitle").innerHTML = `${notes[event.currentTarget.id].title}`;
           document.getElementById("modal_noteText").innerHTML = `${notes[event.currentTarget.id].text}`;
+
+          $('#noteModal').data('postId', `${event.currentTarget.id}`)
+          console.log($('#noteModal').data('postId'));
+
+        }
+
+        function deleteNote(id) {
+          firebase.database().ref(`notes/${id}`).remove();
+          readNotes();
+        }
+
+        function editWindow() {
+          document.getElementById("editNoteTitleField").value = `${notes[$('#noteModal').data('postId')].title}`;
+          document.getElementById("editNoteTextField").value = `${notes[$('#noteModal').data('postId')].text}`;
+        }
+
+        function editNote() {
+          let noteTitle = document.getElementById("editNoteTitleField").value;
+          let noteText = document.getElementById("editNoteTextField").value;
+          let uuid = $('#noteModal').data('postId');
+
+          console.log(uuid);
+
+          firebase.database().ref(`notes/${uuid}`).set({
+            title: `${noteTitle}`,
+            text: `${noteText}`,
+          })
+
+          readNotes();
         }
 
       </script>
@@ -101,7 +122,31 @@
         </div>
       </div>
 
-      <div class="modal fade" id="noteModal">
+      <div class="modal fade" id="editNoteModal" data-postId="">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-title text-center">
+              <h2>Edit Note</h2>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="inputNoteTitle">Note Title</label>
+                <input class="form-control" id="editNoteTitleField" placeholder="Title">
+              </div>
+              <div class="form-group">
+                <label for="inputNoteText">Note Text</label>
+                <textarea class="form-control" id="editNoteTextField" placeholder="Text" rows="4"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal" style="display: inline;">Close</button>
+              <button class="btn btn-primary center-block" onclick="editNote()" data-dismiss="modal" style="display: inline;">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="noteModal" data-postId="">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
             <div class="modal-title text-center">
@@ -112,6 +157,8 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-primary" data-dismiss="modal" style="display: inline;">Close</button>
+              <button class="btn btn-primary" data-dismiss="modal" onclick="deleteNote($('#noteModal').data('postId'))" style="display: inline;">Delete</button>
+              <button class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#editNoteModal" onclick="editWindow()"style="display: inline;">Edit</button>
             </div>
           </div>
         </div>
