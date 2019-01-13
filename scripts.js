@@ -1,4 +1,5 @@
 var user;
+var notes;
 
 function signInClickListener(email, password) {
 	firebase.auth().signInWithEmailAndPassword(email, password)

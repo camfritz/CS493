@@ -2,10 +2,16 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
         <script src="./scripts.js"></script>
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css" integrity="sha384-PmY9l28YgO4JwMKbTvgaS7XNZJ30MK9FAZjjzXtlqyZCqBY6X6bXIkM++IkyinN+" crossorigin="anonymous">
+
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js" integrity="sha384-vhJnz1OVIdLktyixHY4Uk3OHEwdQqPppqYR8+5mjsauETgLOcEynD9oPHhhz18Nw" crossorigin="anonymous"></script>
+
         <link rel="stylesheet" href="./css/bootstrap-social.css">
+        <script src="plugins/bootstrap/js/bootstrap.min.js"></script>
         <title>Firebase Auth</title>
 
         <script src="https://www.gstatic.com/firebasejs/5.7.2/firebase.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/node-uuid/1.4.8/uuid.js"></script>
 
         <script>
           var config = {
@@ -22,11 +28,94 @@
       <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
 
       <script>
-        $(document).ready(function() {
+        $(document).ready(function(event) {
           getCurrentUser();
+          readNotes();
         })
+
+        function addNote() {
+          var uuid1 = uuid();
+          var noteTitle = document.getElementById("noteTitleField").value;
+          var noteText = document.getElementById("noteTextField").value;
+          firebase.database().ref(`notes/${uuid1}`).set({
+            title: `${noteTitle}`,
+            text: `${noteText}`,
+          })
+
+          document.getElementById("noteTitleField").value = "";
+          document.getElementById("noteTextField").value = "";
+        }
+
+        function readNotes() {
+          firebase.database().ref('notes/').on('value', posts => {
+            notes = posts.val();
+            console.log(Object.keys(notes));
+
+            document.getElementById("notesList").innerHTML = "";
+
+            Object.keys(notes).map((j, i) => {
+              var data = `<div class="card-body" id="${j}" onclick=openNote(event) data-toggle="modal" data-target="#noteModal" style="background: white; padding: 3 0 3 0;"><h4 class="text-center card-text">${notes[j].title}</h4></div><br>`
+              document.getElementById("notesList").innerHTML += data;
+            })
+          })
+        }
+
+        // $(document).on('show.bs.modal','#noteModal', function(event) {
+        //   alert('hi');
+        //   // console.log(`${notes[event.target.id].title}`);
+        // // console.log(`${event.target.id}`)
+        // })
+
+        function openNote(event) {
+          event.preventDefault();
+          console.log(`${notes[event.currentTarget.id].title}`)
+
+          document.getElementById("modal_noteTitle").innerHTML = `${notes[event.currentTarget.id].title}`;
+          document.getElementById("modal_noteText").innerHTML = `${notes[event.currentTarget.id].text}`;
+        }
+
       </script>
-      </head>
+    </head>
+
+      <div class="modal fade" id="addNoteModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-title text-center">
+              <h2>Add New Note</h2>
+            </div>
+            <div class="modal-body">
+              <div class="form-group">
+                <label for="inputNoteTitle">Note Title</label>
+                <input class="form-control" id="noteTitleField" placeholder="Title">
+              </div>
+              <div class="form-group">
+                <label for="inputNoteText">Note Text</label>
+                <textarea class="form-control" id="noteTextField" placeholder="Text" rows="4"></textarea>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal" style="display: inline;">Close</button>
+              <button class="btn btn-primary center-block" onclick="addNote()" data-dismiss="modal" style="display: inline;">Submit</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="noteModal">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-title text-center">
+              <h2 id="modal_noteTitle">Modal Note Title</h2>
+            </div>
+            <div class="modal-body">
+              <h2 id="modal_noteText" class="text-center">Modal Note Text</h2>
+            </div>
+            <div class="modal-footer">
+              <button class="btn btn-primary" data-dismiss="modal" style="display: inline;">Close</button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div class="container" style="margin: 50 auto; width: 50%;">
         <div class="jumbotron">
@@ -40,4 +129,18 @@
         </div>
           <br>
         </div>
+      </div>
+
+      <h2 class="text-center">Notes</h2>
+      <div class="container" style="margin: 50 auto; width: 50%">
+        <div class="jumbotron" id="notesList">
+          <div class="card-body" style="background: white; padding: 3 0 3 0;">
+            <h4 class="text-center card-text">Note 1</h4>
+          </div>
+          <br>
+          <div class="card-body" style="background: white; padding: 3 0 3 0;">
+            <h4 class="text-center card-text">Note 2</h4>
+          </div>
+        </div>
+        <button type="button" class="btn btn-primary center-block" id="addNoteButton" data-toggle="modal" data-target="#addNoteModal">Create New Note</button>
       </div>
