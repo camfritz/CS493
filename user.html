@@ -32,14 +32,13 @@
 
         $(document).ready(function(event) {
           getCurrentUser();
-          readNotes();
         })
 
         function addNote() {
           var uuid1 = uuid();
           var noteTitle = document.getElementById("noteTitleField").value;
           var noteText = document.getElementById("noteTextField").value;
-          firebase.database().ref(`notes/${uuid1}`).set({
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid1}`).set({
             title: `${noteTitle}`,
             text: `${noteText}`,
           })
@@ -49,7 +48,7 @@
         }
 
         function readNotes() {
-          firebase.database().ref('notes/').on('value', posts => {
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/`).on('value', posts => {
             notes = posts.val();
 
             document.getElementById("notesList").innerHTML = "";
@@ -83,7 +82,7 @@
           readNotes();
           var image = `${notes[id].image}`
           let storageRef = firebase.storage().ref();
-          let folderRef = storageRef.child(`files/${$('#noteModal').data('postId')}`)
+          let folderRef = storageRef.child(`${firebase.auth().currentUser.uid}/files/${$('#noteModal').data('postId')}`)
 
           document.getElementById("modal_files").innerHTML = "";
 
@@ -96,7 +95,7 @@
         }
 
         function deleteNote(id) {
-          firebase.database().ref(`notes/${id}`).remove();
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${id}`).remove();
           readNotes();
         }
 
@@ -112,7 +111,7 @@
 
           console.log(uuid);
 
-          firebase.database().ref(`notes/${uuid}`).set({
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid}`).set({
             title: `${noteTitle}`,
             text: `${noteText}`,
             image: `${currentFileName}`,
@@ -129,13 +128,13 @@
           let file = files[0];
           let uuid = $('#noteModal').data('postId');
 
-          let fileRef = storageRef.child(`files/${$('#noteModal').data('postId')}/${file.name}`);
+          let fileRef = storageRef.child(`${firebase.auth().currentUser.uid}/files/${$('#noteModal').data('postId')}/${file.name}`);
 
           fileRef.put(file).then(function() {
             console.log('File successfully uploaded!');
             console.log(file);
 
-            firebase.database().ref(`notes/${uuid}`).set ({
+            firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid}`).set ({
               title: `${currentTitle}`,
               text: `${currentText}`,
               image: file.name
