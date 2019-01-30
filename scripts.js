@@ -1,4 +1,4 @@
-var user;
+var currentUser;
 var notes;
 
 function signInClickListener(email, password) {
@@ -6,7 +6,6 @@ function signInClickListener(email, password) {
 	.then(function() {
 		console.log(email)
 		window.location.replace("./user.html");
-		user = firebase.auth().currentUser;
 	})
 	.catch(function(error) {
 		alert(error)
@@ -45,10 +44,14 @@ firebase.auth().onAuthStateChanged(function(user) {
 
 				displayName = user.displayName
 				document.getElementById("name").innerHTML = displayName;
+
+				currentUser = user;
+				readNotes();
 			}
 		}
 		else {
 			window.location.replace("./index.html")
+			currentUser = null;
 		}
 	});
 }

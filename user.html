@@ -32,14 +32,17 @@
 
         $(document).ready(function(event) {
           getCurrentUser();
-          readNotes();
         })
+
+        function addCollection() {
+
+        }
 
         function addNote() {
           var uuid1 = uuid();
           var noteTitle = document.getElementById("noteTitleField").value;
           var noteText = document.getElementById("noteTextField").value;
-          firebase.database().ref(`notes/${uuid1}`).set({
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid1}`).set({
             title: `${noteTitle}`,
             text: `${noteText}`,
           })
@@ -49,7 +52,7 @@
         }
 
         function readNotes() {
-          firebase.database().ref('notes/').on('value', posts => {
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/`).on('value', posts => {
             notes = posts.val();
 
             document.getElementById("notesList").innerHTML = "";
@@ -64,6 +67,8 @@
         function openNote(event) {
           event.preventDefault();
 
+          document.getElementById("file-upload").value = '';
+          document.getElementById("uploadProgress").style.visibility = 'hidden';
           document.getElementById("modal_noteTitle").innerHTML = `${notes[event.currentTarget.id].title}`;
           document.getElementById("modal_noteText").innerHTML = `${notes[event.currentTarget.id].text}`;
 
@@ -83,7 +88,7 @@
           readNotes();
           var image = `${notes[id].image}`
           let storageRef = firebase.storage().ref();
-          let folderRef = storageRef.child(`files/${$('#noteModal').data('postId')}`)
+          let folderRef = storageRef.child(`${firebase.auth().currentUser.uid}/files/${$('#noteModal').data('postId')}`)
 
           document.getElementById("modal_files").innerHTML = "";
 
@@ -96,7 +101,7 @@
         }
 
         function deleteNote(id) {
-          firebase.database().ref(`notes/${id}`).remove();
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${id}`).remove();
           readNotes();
         }
 
@@ -112,7 +117,7 @@
 
           console.log(uuid);
 
-          firebase.database().ref(`notes/${uuid}`).set({
+          firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid}`).set({
             title: `${noteTitle}`,
             text: `${noteText}`,
             image: `${currentFileName}`,
@@ -129,29 +134,39 @@
           let file = files[0];
           let uuid = $('#noteModal').data('postId');
 
-          let fileRef = storageRef.child(`files/${$('#noteModal').data('postId')}/${file.name}`);
+          let fileRef = storageRef.child(`${firebase.auth().currentUser.uid}/files/${$('#noteModal').data('postId')}/${file.name}`);
 
-          fileRef.put(file).then(function() {
-            console.log('File successfully uploaded!');
-            console.log(file);
+          document.getElementById("uploadProgress").style.visibility = 'visible';
 
-            firebase.database().ref(`notes/${uuid}`).set ({
-              title: `${currentTitle}`,
-              text: `${currentText}`,
-              image: file.name
-            });
+          fileRef.put(file).on('state_changed', function(snapshot) {
+            var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log(progress);
+            document.getElementById("uploadProgress").innerHTML = `Upload Progress: ${progress.toFixed(2)}%`;
+          }, function(error) {
+              console.log(error);
+              alert(error);
+          }, function() {
+              console.log('File successfully uploaded!');
+              console.log(file);
 
-            currentFileName = file.name
+              document.getElementById("uploadProgress").innerHTML = "File successfully uploaded!";
 
-            refreshFiles($('#noteModal').data('postId'));
+              firebase.database().ref(`${firebase.auth().currentUser.uid}/notes/${uuid}`).set ({
+                title: `${currentTitle}`,
+                text: `${currentText}`,
+                image: file.name
+              });
 
-          }).catch(err => {
-            console.log(err);
+              currentFileName = file.name
+
+              refreshFiles($('#noteModal').data('postId'));
           });
         }
 
       </script>
     </head>
+
+    <!-------------------------------------------------------------->
 
       <div class="modal fade" id="addNoteModal">
         <div class="modal-dialog modal-dialog-centered">
@@ -219,6 +234,8 @@
               <div class="form-group" style="float: left;">
               <label for="file-upload">Upload a File</label>
               <input id="file-upload" type="file" onchange="uploadFile(this.files)"style="display: inline;"/>
+              <br>
+              <a style="display: inline; visibility: hidden;" id="uploadProgress">x%</a>
             </div>
             </div>
           </div>
